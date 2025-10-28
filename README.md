@@ -1,11 +1,12 @@
-## Prediction Market – Confidential Bets on EVM
+## PredaMark – Linera Prediction Market
 
-This repository contains a full-stack prediction market prototype:
-- **Smart contracts** in `contracts/` built with Hardhat
+This repository contains a full-stack prediction market built on **Linera**, a decentralized protocol for real-time Web3 applications.
+
+### Architecture
+
+- **Linera Application** in `linera-app/` - Rust/WASM prediction market app
 - **React frontend** in `frontend/` for placing and viewing bets
-- **Oracle utility** in `oracle/` for resolving outcomes programmatically
-
-The core contract `PredictionMarket.sol` uses Oasis Sapphire primitives to encrypt user predictions on-chain, keeping each bet’s direction confidential until resolution.
+- **Smart contracts** in `contracts/` - Legacy Solidity/EVM contracts (for reference)
 
 ### Repository Structure
 - `contracts/` – Solidity sources (see `PredictionMarket.sol`)
@@ -16,48 +17,71 @@ The core contract `PredictionMarket.sol` uses Oasis Sapphire primitives to encry
 - `oracle/` – Example resolver script (`resolver.py`)
 
 ## Prerequisites
+- **Rust 1.81+** ([Install Rust](https://rustup.rs))
 - Node.js 18+ and npm
-- Python 3.10+ (only if using the `oracle/` resolver)
-- Git
+- Cargo (comes with Rust)
 
-### Global notes
-- Commands below use `PowerShell` friendly syntax (works on Windows). On macOS/Linux, the commands are the same unless noted.
+## Quick Start with Linera
 
-## Quick Start
-1) Install dependencies at the root and in `frontend/`:
+### 1. Install Linera CLI
+
 ```bash
+cd linera-protocol
+cargo build --release -p linera-service -p linera-storage-service
+export PATH="$PWD/target/release:$PATH"
+```
+
+### 2. Start Linera Network
+
+```bash
+source <(linera net helper)
+linera_spawn linera net up --with-faucet --faucet-port 8079
+```
+
+### 3. Build the Application
+
+```bash
+cd ../linera-app
+cargo build --release --target wasm32-unknown-unknown
+```
+
+### 4. Deploy to Linera
+
+```bash
+LINERA_APPLICATION_ID=$(linera publish-and-create \
+  ../target/wasm32-unknown-unknown/release/prediction_market_{contract,service}.wasm \
+  --json-argument '{}')
+echo "Application ID: $LINERA_APPLICATION_ID"
+```
+
+### 5. Start Frontend
+
+```bash
+cd ../frontend
 npm install
-cd frontend && npm install && cd ..
-```
-
-2) Start a local Hardhat node in one terminal:
-```bash
-npx hardhat node
-```
-
-3) In a second terminal, deploy the contract to the local network:
-```bash
-npx hardhat run scripts\deploy.js --network localhost
-```
-The script will print the deployed address.
-
-4) Start the frontend (third terminal):
-```bash
-cd frontend
 npm start
 ```
-Open `http://localhost:3000` and connect your wallet to the same network (e.g., Hardhat localhost).
 
-## Smart Contracts
-### `contracts/PredictionMarket.sol`
-- Stores encrypted user predictions using Sapphire’s Curve25519 utilities
-- `placeBet(bool _prediction)` – place a bet with `msg.value`; prediction is encrypted on-chain
-- `resolveBet(uint256 _betId, bool _actualOutcome)` – decrypts and pays out if the prediction matches the outcome
-- `nextUnresolvedBetId()` – helper to find the next unresolved bet
+Visit `http://localhost:3000` to use the application.
 
-Key events and state:
-- `event NewBet(uint256 betId, address better)` emitted on every bet
-- `mapping(uint256 => Bet) bets` and `uint256 betCounter`
+## Linera Application
+
+### `linera-app/src/contract.rs`
+Core prediction market logic in Rust/WASM:
+- `PlaceBet { prediction: bool }` – Place a bet on an outcome
+- `ResolveBet { bet_id: u64, actual_outcome: bool }` – Resolve and payout
+
+State management:
+- `bet_counter`: RegisterView<u64> - Counter for bet IDs
+- `bets`: MapView<u64, Bet> - Mapping from bet ID to bet
+
+Built with Linera SDK for real-time Web3 applications.
+
+### GraphQL API (`src/service.rs`)
+Query and mutate the application state:
+- Query: `bet_count` - Get total number of bets
+- Mutation: `placeBet(prediction: bool)` - Place a bet
+- Mutation: `resolveBet(betId: u64, actualOutcome: bool)` - Resolve a bet
 
 ### Build, Test, and Deploy
 ```bash
@@ -95,12 +119,9 @@ npm start
 - The app expects a deployed `PredictionMarket` contract. Point your wallet (e.g., MetaMask) to the same network where the contract is deployed (localhost for development).
 - If you wire the contract address into the UI, store it in a small configuration module or environment variable as you prefer.
 
-## Oracle / Resolver
-The `oracle/resolver.py` script is a placeholder for outcome resolution automation. Typical flow:
-1) Determine the real-world outcome from a data source
-2) Call the contract’s `resolveBet(betId, actualOutcome)` from an authorized account
-
-### Python environment
+## Oracle / Resolver (optional)
+You can implement an off-chain resolver to call `resolveBet(betId, actualOutcome)` as needed.
+Python environment:
 ```bash
 python -m venv .venv
 .\.venv\Scripts\activate
@@ -116,8 +137,34 @@ pip install -r requirements.txt
 
 ## Troubleshooting
 - **Frontend can’t find contract**: Ensure you’ve deployed to the same network your wallet is connected to, and the address is configured where the frontend expects it.
-- **Nonce or encryption issues**: Re-deploy locally to reset state. Ensure you’re using a recent Hardhat/ethers environment.
 - **Windows paths**: The README uses backslashes for Windows. On macOS/Linux, replace `scripts\deploy.js` with `scripts/deploy.js` and remove drive letters.
 
 ## License
 MIT
+
+# 1. Build Linera CLI (Rust)
+cd linera-protocol
+cargo build --release -p linera-service
+
+# 2. Start Linera network
+linera_spawn linera net up --with-faucet
+
+# 3. Initialize wallet & get chain ID
+linera wallet init
+# Get chain ID from output
+
+# 4. Build Linera app (Rust to WASM)
+cd linera-app
+cargo build --release --target wasm32-unknown-unknown
+
+# 5. Deploy app & get application ID
+linera publish-and-create ...
+
+# 6. Edit frontend/src/config/linera.js with IDs
+# Application ID and Chain ID
+
+# 7. Start Linera service on port 8080
+linera service --port 8080
+
+# 8. Run frontend
+cd frontend && npm start
