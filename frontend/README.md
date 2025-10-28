@@ -1,70 +1,187 @@
-# Getting Started with Create React App
+# PredaMark Frontend - Linera Integration
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This frontend has been updated to support Linera blockchain integration.
 
-## Available Scripts
+## Setup
 
-In the project directory, you can run:
+### 1. Install Dependencies
 
-### `npm start`
+```bash
+npm install
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+This will install:
+- GraphQL packages (`graphql`, `graphql-request`)
+- React dependencies
+- Other UI libraries
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 2. Configure Linera Environment
 
-### `npm test`
+Create a `.env` file in the `frontend/` directory:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```env
+# Linera Service Configuration
+REACT_APP_LINERA_SERVICE_URL=http://localhost:8080
+REACT_APP_LINERA_APPLICATION_ID=your-application-id-here
+REACT_APP_LINERA_CHAIN_ID=your-chain-id-here
+REACT_APP_LINERA_FAUCET_URL=http://localhost:8079
+```
 
-### `npm run build`
+Or update `src/config/linera.js` directly:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```javascript
+export const LINERA_SERVICE_URL = 'http://localhost:8080';
+export const LINERA_APPLICATION_ID = 'your-application-id';
+export const LINERA_CHAIN_ID = 'your-chain-id';
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 3. Start Development Server
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+npm start
+```
 
-### `npm run eject`
+Visit `http://localhost:3000`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Files Created/Modified
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### New Files:
+- `src/config/linera.js` - Linera configuration and GraphQL queries
+- `src/services/lineraService.js` - Linera GraphQL service client
+- `src/pages/PredictionPageLinera.js` - Updated page component with Linera integration
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Modified Files:
+- `package.json` - Added GraphQL dependencies
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## How It Works
 
-## Learn More
+### 1. Linera Service (`src/services/lineraService.js`)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+The `LineraService` class provides methods to interact with the Linera application:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```javascript
+import { lineraService } from '../services/lineraService';
 
-### Code Splitting
+// Get bet count
+const count = await lineraService.getBetCount();
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+// Place a bet
+await lineraService.placeBet(true); // true for "yes", false for "no"
 
-### Analyzing the Bundle Size
+// Resolve a bet
+await lineraService.resolveBet(0, true); // betId, actualOutcome
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### 2. Configuration (`src/config/linera.js`)
 
-### Making a Progressive Web App
+Defines:
+- Connection URLs and IDs
+- GraphQL query/mutation strings
+- Helper functions
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### 3. Updated Components
 
-### Advanced Configuration
+The PredictionPage component has been updated to:
+- Use Linera service instead of ethers.js
+- Connect to Linera GraphQL endpoint
+- Display connection status
+- Show bet count from chain
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Using the Updated Components
 
-### Deployment
+### Option 1: Update Existing Page
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Replace the imports in `PredictionPage.js`:
 
-### `npm run build` fails to minify
+```javascript
+// Old:
+import { connectWalletSafely } from '../utils/wallet';
+import { ethers } from 'ethers';
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+// New:
+import { lineraService } from '../services/lineraService';
+```
+
+### Option 2: Use New Component
+
+Switch `App.js` to use the new component:
+
+```javascript
+import PredictionPageLinera from './pages/PredictionPageLinera';
+
+// Update route:
+<Route path="/market/:id" element={<PredictionPageLinera />} />
+```
+
+## GraphQL Queries
+
+The frontend uses these GraphQL operations:
+
+### Query Bet Count
+```graphql
+query {
+  betCount
+}
+```
+
+### Place a Bet
+```graphql
+mutation {
+  placeBet(prediction: true)
+}
+```
+
+### Resolve a Bet
+```graphql
+mutation {
+  resolveBet(betId: 0, actualOutcome: true)
+}
+```
+
+## Testing
+
+### Test Linera Connection
+
+1. Start Linera service on port 8080
+2. Set your application ID in `.env` or config
+3. Visit the prediction page
+4. Click "Connect to Linera"
+5. You should see "✅ Connected" status
+
+### Test Betting
+
+1. Connect to Linera
+2. Select Yes/No outcome
+3. Enter amount
+4. Click "Buy YES" or "Buy NO"
+5. Check recent bets section
+
+## Troubleshooting
+
+### "LINERA_CHAIN_ID and LINERA_APPLICATION_ID must be set"
+- Make sure you've deployed your Linera application
+- Update the config with the correct IDs
+- Restart the dev server after changing `.env`
+
+### "Failed to connect"
+- Ensure Linera service is running on port 8080
+- Check that your application ID is correct
+- Verify your chain ID is valid
+
+### "Query failed"
+- Check browser console for detailed error
+- Verify GraphQL endpoint is accessible
+- Make sure Linera node is running
+
+## Next Steps
+
+1. Deploy the Linera application (see `../linera-app/README.md`)
+2. Get your application ID and chain ID
+3. Update frontend configuration
+4. Start the frontend and test!
+
+## Resources
+
+- [Linera Documentation](https://linera.dev)
+- [Linera GitHub](https://github.com/linera-io/linera-protocol)
+- [GraphQL Documentation](https://graphql.org/)
