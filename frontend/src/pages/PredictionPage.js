@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ethers } from 'ethers';
-import { wrapEthereumProvider, NETWORKS } from '@oasisprotocol/sapphire-paratime';
-import { connectWalletSafely, switchOrAddChain } from '../utils/wallet';
+import { connectWalletSafely } from '../utils/wallet';
 import PriceChart from '../components/PriceChart';
 import './PredictionPage.css';
 
@@ -106,10 +105,7 @@ const PredictionPage = () => {
 
     setLoading(true);
     try {
-      // Ensure Sapphire testnet and connect provider
-      await switchOrAddChain();
-      const wrappedProvider = wrapEthereumProvider(window.ethereum, NETWORKS.testnet);
-      const provider = new ethers.BrowserProvider(wrappedProvider);
+      const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       
       // Mock contract interaction - replace with actual contract
