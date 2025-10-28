@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
-import PredictionPage from './pages/PredictionPage';
+import PredictionPageLinera from './pages/PredictionPageLinera';
 import DashboardPage from './pages/DashboardPage';
 import LeaderboardPage from './pages/LeaderboardPage';
 import AboutPage from './pages/AboutPage';
@@ -14,7 +14,7 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/market/:id" element={<PredictionPage />} />
+          <Route path="/market/:id" element={<PredictionPageLinera />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/about" element={<AboutPage />} />
