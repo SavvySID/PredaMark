@@ -7,7 +7,7 @@ const AboutPage = () => {
       <div className="about-hero">
         <h1>About PredaMark</h1>
         <p className="hero-subtitle">
-          The future of prediction markets, built on Oasis Sapphire for confidential and secure trading
+          The future of prediction markets with a modern, secure, and user-friendly experience
         </p>
       </div>
 
@@ -16,8 +16,7 @@ const AboutPage = () => {
           <h2>What is PredaMark?</h2>
           <p>
             PredaMark is a decentralized prediction market platform that allows users to trade on the outcomes 
-            of real-world events. Built on Oasis Sapphire, our platform leverages confidential computing to 
-            ensure your predictions remain private while maintaining the transparency and security of blockchain technology.
+            of real-world events. Our platform is designed for performance and security while keeping the user experience simple.
           </p>
           <p>
             Whether you're predicting the outcome of elections, sports events, cryptocurrency prices, or technological 
@@ -25,31 +24,7 @@ const AboutPage = () => {
           </p>
         </div>
 
-        <div className="about-section">
-          <h2>Why Oasis Sapphire?</h2>
-          <div className="features-grid">
-            <div className="feature-item">
-              <div className="feature-icon">🔒</div>
-              <h3>Confidential Computing</h3>
-              <p>Your predictions and trading strategies remain private through advanced encryption and confidential computing.</p>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">⚡</div>
-              <h3>High Performance</h3>
-              <p>Fast transaction processing and instant settlements powered by Oasis Sapphire's optimized infrastructure.</p>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">🛡️</div>
-              <h3>Enhanced Security</h3>
-              <p>Military-grade security with privacy-preserving smart contracts and secure execution environments.</p>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon">🌍</div>
-              <h3>Global Access</h3>
-              <p>Trade from anywhere in the world with low fees and high throughput, regardless of your location.</p>
-            </div>
-          </div>
-        </div>
+        
 
         <div className="about-section">
           <h2>How It Works</h2>
@@ -72,7 +47,7 @@ const AboutPage = () => {
               <div className="step-number">3</div>
               <div className="step-content">
                 <h3>Place Bets</h3>
-                <p>Make confidential predictions using ROSE tokens on Oasis Sapphire testnet.</p>
+                <p>Place your predictions using your connected wallet on supported networks.</p>
               </div>
             </div>
             <div className="step">
@@ -103,11 +78,6 @@ const AboutPage = () => {
           <h2>Technology Stack</h2>
           <div className="tech-grid">
             <div className="tech-item">
-              <div className="tech-logo">🌹</div>
-              <h3>Oasis Sapphire</h3>
-              <p>Confidential computing platform for privacy-preserving smart contracts</p>
-            </div>
-            <div className="tech-item">
               <div className="tech-logo">⚛️</div>
               <h3>React</h3>
               <p>Modern frontend framework for responsive user interfaces</p>
@@ -128,8 +98,7 @@ const AboutPage = () => {
         <div className="about-section">
           <h2>Get Started</h2>
           <p>
-            Ready to start making confidential predictions? Join PredaMark today and experience the future 
-            of prediction markets built on Oasis Sapphire.
+            Ready to start making predictions? Join PredaMark today and experience a streamlined prediction market.
           </p>
           <div className="cta-buttons">
             <button className="cta-btn primary">Start Trading</button>
